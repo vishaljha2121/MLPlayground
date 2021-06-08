@@ -1,45 +1,84 @@
+# importing libraries
+import os
 import flask
 import pandas as pd
 import tensorflow as tf
 from tensorflow import keras
 
 keras.__version__
-from keras.models import load_model
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing import image
+import numpy as np
 
 # instantiate flask
 app = flask.Flask(__name__)
 
-# we need to redefine our loss function in order to use it when loading the model
-def auc(y_true, y_pred):
-    auc = tf.metrics.auc(y_true, y_pred)[1]
-    keras.backend.get_session().run(tf.local_variables_initializer())
-    return auc
+# folder locations
+STATIC_FOLDER = "static"
+UPLOAD_FOLDER = STATIC_FOLDER + "/uploads"
+MODEL_FOLDER = "/Models"
 
 
-# load the model, and pass in the custom loss function
-global graph
-graph = tf.get_default_graph()
-model = load_model("Models/model.h5", custom_objects={"auc": auc})
+@app.route("/upload", methods=["POST"])
+# file upload and saving
+def upload():
+    # fetch file from json input
+    file = flask.request.files["image"]
+    if file == "":
+        return "Please enter an image"
+    file_location = os.path.join(UPLOAD_FOLDER, file.filename)
+    file.save(file_location)
 
-# define a predict function as an endpoint
-@app.route("/predict", methods=["GET", "POST"])
-def predict():
-    data = {"success": False}
-
-    params = flask.request.json
-    if params == None:
-        params = flask.request.args
-
-    # if parameters are found, echo the msg parameter
-    if params != None:
-        x = pd.DataFrame.from_dict(params, orient="index").transpose()
-        with graph.as_default():
-            data["prediction"] = str(model.predict(x)[0][0])
-            data["success"] = True
-
-    # return a reponse in json format
-    return flask.jsonify(data)
+    # call prediction function
+    result = predict_results(file_location)
+    return result
 
 
-# start the flask app, allow remote connections
-app.run(host="0.0.0.0")
+# get image data
+def get_image(file_location):
+    image_loaded = image.load_img(file_location, target_size=(64, 64, 1))
+    image_loaded = image.img_to_array(image_loaded)
+    image_loaded = image_loaded / 255
+    image_loaded = np.expand_dims(image_loaded, axis=0)
+    return image_loaded
+
+
+# generate predictions
+def predict_results(data):
+    image = get_image(data)
+    prediction = model.predict(image, batch_size=None, steps=1)
+    if prediction[:, :] > 0.5:
+        label = "Dog"
+    else:
+        label = "Cat"
+    return {"label": label}
+
+
+def load__model():
+    global model
+    model = load_model(STATIC_FOLDER + MODEL_FOLDER + "/model.h5")
+    global graph
+    graph = tf.compat.v1.get_default_graph()
+
+
+def start_server():
+    app.run(debug=False)
+
+
+def run():
+    # load model
+    print("[INFO] : Loading model.....")
+    load__model()
+    print("[INFO] : Model Loaded.")
+
+    # run server
+    print("[INFO] : Starting server")
+    start_server()
+
+    # fetch and save file -> load file -> predict
+    " auto upload() call on post method to [/upload]"
+    # show label
+    # TODO
+
+
+run()  # running all
