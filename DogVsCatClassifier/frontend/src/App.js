@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import "./App.css";
 import axios from "axios";
 import { apiUrl } from "./config";
+const header = new Headers();
 
 class App extends Component {
   constructor(props) {
@@ -20,8 +21,7 @@ class App extends Component {
   };
 
   fileUploadHandler = () => {
-    const header = new Headers();
-    header.append("Access-Control-Allow-Origin", "http://localhost:3000");
+    header.append("Access-Control-Allow-Origin", "*");
     header.append("Access-Control-Allow-Credentials", "true");
     var fd = new FormData();
     fd.append("image", this.state.selectedFile, header);
