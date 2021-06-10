@@ -26,31 +26,7 @@ Dependencies can be installed by using *server/requirement.txt* file.
     cnn.add(tf.keras.layers.Dense(units=1, activation='sigmoid'))
     
     cnn.compile(optimizer='adam', loss  =  'binary_crossentropy', metrics  = ['accuracy'])
-    
-    
-_________________________________________________________________
-Layer (type)                 Output Shape              Param #   
-=================================================================
-conv2d_6 (Conv2D)            (None, 62, 62, 32)        896       
-_________________________________________________________________
-max_pooling2d_6 (MaxPooling2 (None, 31, 31, 32)        0         
-_________________________________________________________________
-conv2d_7 (Conv2D)            (None, 29, 29, 32)        9248      
-_________________________________________________________________
-max_pooling2d_7 (MaxPooling2 (None, 14, 14, 32)        0         
-_________________________________________________________________
-flatten_3 (Flatten)          (None, 6272)              0         
-_________________________________________________________________
-dense_6 (Dense)              (None, 128)               802944    
-_________________________________________________________________
-dense_7 (Dense)              (None, 1)                 129       
-=================================================================
-Total params: 813,217
-Trainable params: 813,217
-Non-trainable params: 0
-_________________________________________________________________
-
-
+   
 ## Conclusion
 
 The Architecture and parameter used in this network are capable of producing accuracy of  **97.56%**  on Validation Data which is pretty good. It is possible to Achieve more accuracy on this dataset using deeper network and fine tuning of network parameters for training. You can download this trained model from resource directory and Play with it.
