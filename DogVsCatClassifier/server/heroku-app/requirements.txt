@@ -1,7 +1,0 @@
-Flask==1.1.2
-Flask-RESTful==0.3.8
-Pillow==7.2.0
-gunicorn==19.0.0
-flask-cors
-ipython==7.16.1
-ipython-genutils==0.2.0
